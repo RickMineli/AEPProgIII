@@ -16,55 +16,59 @@ public class ClientAEP {
 		ClientAEP c = new ClientAEP();
 		c.start();
 	}
-	
+
 	private void start() {
-		try(Socket server = new Socket("localhost",9092)) {
-			
-			Scanner console =  new  Scanner(System.in);
-			Scanner fromServer =  new  Scanner(server.getInputStream());
-			PrintWriter toServer = new PrintWriter(server.getOutputStream());
+		while (true) {
+			String command = "";
+			String command2[];
+			Scanner console = new Scanner(System.in);
+			System.out.println("Please connect to an localhost using: \n connect <port>  \n Avaliable ports: 9092");
+			command = console.nextLine();
+			command2 = command.split(" ");
 			String serverResponse = "";
-			System.out.println("? for help");
-			System.out.println("Please use command set to set a path first.");
-			do {
-				System.out.println("Send a command to server: ");
-				String command = console.nextLine();
-				String command2[] = command.split(" ");
-				String fileExtension[] = command.split(".");
-				toServer.println(command);
-				toServer.flush();
-				
-				while(!serverResponse.equals("$")) {
-					if (command2[0].equals("sendFile")) {
-					String filePath = (command2[command2.length-1]);
-					toServer.println(fileExtension[fileExtension.length-1]);
-					sendFile(filePath, server);
-					}else{
+			try (Socket server = new Socket("localhost", Integer.parseInt(command2[1]))) {
+				Scanner fromServer = new Scanner(server.getInputStream());
+				PrintWriter toServer = new PrintWriter(server.getOutputStream(), true);				
+				String fileExtension[];
+				System.out.println("Please use command set to set a path first.");
+				while (!command.equals("exit")) {
+					System.out.println("Type your command: ");
+					command = console.nextLine();
+					command2 = command.split(" ");
+					toServer.println(command);
+//
+//					if (command2[0].equals("sendFile")) {							
+//						fileExtension = command.split("\\.");
+//						String filePath = (command2[command2.length - 1]);
+//						toServer.println(fileExtension[fileExtension.length - 1]);
+//						sendFile(filePath, server);
+//						command2[0] = "";
+//					}
+					while (!serverResponse.equals("$")) {
 						serverResponse = fromServer.nextLine();
 						if (!serverResponse.equals("$")) {
 							System.out.println(serverResponse);
-						}	
+						}
 					}
+
+					serverResponse = "";
 				}
-				serverResponse = "";
-			} while (true);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
+
 	public void sendFile(String filePath, Socket server) throws IOException {
 		DataOutputStream dos = new DataOutputStream(server.getOutputStream());
 		FileInputStream fis = new FileInputStream(filePath);
 		byte[] buffer = new byte[4096];
-		
+
 		while (fis.read(buffer) > 0) {
 			dos.write(buffer);
 		}
-		
+
 		fis.close();
-		dos.close();	
+		dos.close();
 	}
-	
-	
 }
