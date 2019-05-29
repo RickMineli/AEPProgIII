@@ -36,14 +36,14 @@ public class ClientAEP {
 					command = console.nextLine();
 					command2 = command.split(" ");
 					toServer.println(command);
-//
-//					if (command2[0].equals("sendFile")) {							
-//						fileExtension = command.split("\\.");
-//						String filePath = (command2[command2.length - 1]);
-//						toServer.println(fileExtension[fileExtension.length - 1]);
-//						sendFile(filePath, server);
-//						command2[0] = "";
-//					}
+
+					if (command2[0].equals("sendFile")) {							
+						fileExtension = command.split("\\.");
+						String filePath = (command2[command2.length - 1]);
+						toServer.println(fileExtension[fileExtension.length - 1]);
+						sendFile(filePath, server);
+						command2[0] = "";
+					}
 					while (!serverResponse.equals("$")) {
 						serverResponse = fromServer.nextLine();
 						if (!serverResponse.equals("$")) {
